@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -73,14 +73,16 @@ body {
 .buy {
     display: block;
     width: 100%;
+    border: none;
     text-align: center;
-    text-decoration: none;
     background: #229ed9;
     color: white;
     padding: 13px;
     border-radius: 12px;
     margin-top: 14px;
     font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 .buy:active {
@@ -93,6 +95,87 @@ body {
     margin-top: 25px;
     font-size: 13px;
 }
+
+/* QR */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.82);
+    z-index: 999;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.modal-box {
+    max-width: 430px;
+    margin: 30px auto;
+    background: #15151d;
+    border: 1px solid #333341;
+    border-radius: 20px;
+    padding: 22px;
+    text-align: center;
+}
+
+.modal-box h2 {
+    margin-bottom: 8px;
+}
+
+.modal-box p {
+    color: #aaa;
+    margin-bottom: 15px;
+}
+
+.qr {
+    width: 280px;
+    max-width: 100%;
+    border-radius: 14px;
+    background: white;
+    padding: 8px;
+    margin: 10px auto 18px;
+}
+
+.info {
+    background: #20202a;
+    border-radius: 12px;
+    padding: 13px;
+    margin: 8px 0;
+    text-align: left;
+}
+
+.info b {
+    color: #fff;
+}
+
+.copy {
+    width: 100%;
+    border: none;
+    background: #33333f;
+    color: white;
+    padding: 11px;
+    border-radius: 10px;
+    margin-top: 8px;
+    cursor: pointer;
+}
+
+.close {
+    width: 100%;
+    border: none;
+    background: #e53935;
+    color: white;
+    padding: 13px;
+    border-radius: 11px;
+    margin-top: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.note {
+    font-size: 13px;
+    color: #999;
+    margin-top: 14px;
+    line-height: 1.5;
+}
 </style>
 </head>
 
@@ -101,11 +184,11 @@ body {
 <div class="container">
 
 <div class="header">
-    <h1>🛒 SHOP Trung Lươn </h1>
-    <p>Chọn sản phẩm và liên hệ Telegram để đặt hàng</p>
+    <h1>🛒 SHOP Trung Lươn</h1>
+    <p>Chọn sản phẩm → chọn gói → thanh toán bằng QR</p>
 </div>
 
-<!-- MÓN 1 -->
+<!-- DELTA -->
 <div class="product">
     <h2>Delta Proxy IPA</h2>
     <div class="type">Proxy / IPA</div>
@@ -135,12 +218,12 @@ body {
         <span>300.000đ</span>
     </div>
 
-    <a class="buy" href="https://t.me/trungluon">
-        💬 Đặt Delta Proxy
-    </a>
+    <button class="buy" onclick="openPayment('Delta Proxy IPA', '1 ngày', 20000)">
+        💳 Mua Delta Proxy
+    </button>
 </div>
 
-<!-- MÓN 2 -->
+<!-- TROLLMODZ -->
 <div class="product">
     <h2>Trollmodz</h2>
     <div class="type">Android / iOS</div>
@@ -165,12 +248,12 @@ body {
         <span>150.000đ</span>
     </div>
 
-    <a class="buy" href="https://t.me/trungluon">
-        💬 Đặt Trollmodz
-    </a>
+    <button class="buy" onclick="openPayment('Trollmodz', '1 giờ', 5000)">
+        💳 Mua Trollmodz
+    </button>
 </div>
 
-<!-- MÓN 3 -->
+<!-- DRIP PROXY -->
 <div class="product">
     <h2>Drip Client - Proxy</h2>
     <div class="type">Proxy</div>
@@ -190,12 +273,12 @@ body {
         <span>200.000đ</span>
     </div>
 
-    <a class="buy" href="https://t.me/trungluon">
-        💬 Đặt Drip Proxy
-    </a>
+    <button class="buy" onclick="openPayment('Drip Client - Proxy', '1 ngày', 45000)">
+        💳 Mua Drip Proxy
+    </button>
 </div>
 
-<!-- MÓN 4 -->
+<!-- DRIP MENU -->
 <div class="product">
     <h2>Drip Client - Menu Android</h2>
     <div class="type">Android</div>
@@ -215,16 +298,160 @@ body {
         <span>200.000đ</span>
     </div>
 
-    <a class="buy" href="https://t.me/trungluon">
-        💬 Đặt Drip Menu
-    </a>
+    <button class="buy" onclick="openPayment('Drip Client - Menu Android', '1 ngày', 35000)">
+        💳 Mua Drip Menu
+    </button>
 </div>
 
 <div class="footer">
-    © 2026 Shop của tôi
+    © 2026 TrungLuon-shop
 </div>
 
 </div>
+
+
+<!-- PAYMENT MODAL -->
+<div class="modal" id="paymentModal">
+
+    <div class="modal-box">
+
+        <h2>💳 Thanh toán</h2>
+
+        <p id="productText"></p>
+
+        <img id="qrImage" class="qr" src="" alt="QR thanh toán">
+
+        <div class="info">
+            <b>Ngân hàng:</b> TPBank
+        </div>
+
+        <div class="info">
+            <b>STK:</b> 88123878888
+            <button class="copy" onclick="copyText('88123878888')">
+                📋 Sao chép STK
+            </button>
+        </div>
+
+        <div class="info">
+            <b>Chủ tài khoản:</b> LA VAN TRUNG
+        </div>
+
+        <div class="info">
+            <b>Số tiền:</b> <span id="amountText"></span>
+        </div>
+
+        <div class="info">
+            <b>Nội dung chuyển khoản:</b>
+            <div id="contentText"></div>
+
+            <button class="copy" onclick="copyPaymentContent()">
+                📋 Sao chép nội dung
+            </button>
+        </div>
+
+        <div class="note">
+            ⚠️ Chuyển khoản đúng số tiền và đúng nội dung để hệ thống nhận diện đơn hàng.
+        </div>
+
+        <button class="close" onclick="closePayment()">
+            Đóng
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let currentContent = "";
+
+function generateOrderCode() {
+
+    const random = Math.floor(100000 + Math.random() * 900000);
+
+    return "TL" + random;
+}
+
+
+function formatMoney(number) {
+
+    return number.toLocaleString("vi-VN") + "đ";
+
+}
+
+
+function openPayment(product, duration, amount) {
+
+    const orderCode = generateOrderCode();
+
+    currentContent = orderCode;
+
+    document.getElementById("productText").innerText =
+        product + " - " + duration;
+
+    document.getElementById("amountText").innerText =
+        formatMoney(amount);
+
+    document.getElementById("contentText").innerText =
+        orderCode;
+
+    /*
+      VietQR:
+      TPBank
+      STK: 88123878888
+      Chủ TK: LA VAN TRUNG
+    */
+
+    const qrUrl =
+        "https://img.vietqr.io/image/TPB-88123878888-compact2.png" +
+        "?amount=" + amount +
+        "&addInfo=" + encodeURIComponent(orderCode) +
+        "&accountName=" + encodeURIComponent("LA VAN TRUNG");
+
+    document.getElementById("qrImage").src = qrUrl;
+
+    document.getElementById("paymentModal").style.display = "block";
+
+}
+
+
+function closePayment() {
+
+    document.getElementById("paymentModal").style.display = "none";
+
+}
+
+
+function copyText(text) {
+
+    navigator.clipboard.writeText(text);
+
+    alert("Đã sao chép!");
+
+}
+
+
+function copyPaymentContent() {
+
+    navigator.clipboard.writeText(currentContent);
+
+    alert("Đã sao chép nội dung chuyển khoản!");
+
+}
+
+
+window.onclick = function(event) {
+
+    const modal = document.getElementById("paymentModal");
+
+    if (event.target === modal) {
+        closePayment();
+    }
+
+};
+
+</script>
 
 </body>
 </html>
